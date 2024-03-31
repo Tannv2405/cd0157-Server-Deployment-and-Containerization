@@ -119,6 +119,7 @@ Resources:
         ZipFile: |
           import json
           import boto3
+          import urllib3
           from botocore.vendored import requests
           def handler(event, context):
             response = {
@@ -132,6 +133,7 @@ Resources:
             }
 
             client = boto3.client('iam')
+            http = urllib3.PoolManager()
             try:
               if event['RequestType'] == 'Create':
                 kubectl_role_name = event['ResourceProperties']['KubectlRoleName']
@@ -156,12 +158,16 @@ Resources:
 
             response_body = json.dumps(response)
             headers = {'content-type': '', "content-length": str(len(response_body)) }
-            put_response = requests.put(event['ResponseURL'], headers=headers, data=response_body)
+            put_response = http.request('POST',
+                        event['ResponseURL'],
+                        body = response_body,
+                        headers=headers,
+                        retries = False)
             return response
 
       Handler: index.handler
       Role: !GetAtt CustomResourceLambdaExecutionRole.Arn
-      Runtime: python3.9
+      Runtime: python3.8
       Timeout: 300
 
   CustomResourceLambdaExecutionRole:
