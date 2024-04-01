@@ -51,6 +51,7 @@ phases:
       - docker push $REPOSITORY_URI:$TAG
       - echo $EKS_CLUSTER_NAME
       - echo $EKS_KUBECTL_ROLE_ARN
+      - aws configure get region
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
       - kubectl config get-contexts 
       - kubectl config use-context arn:aws:eks:us-east-2:905234464429:cluster/simple-jwt-api 
