@@ -52,8 +52,10 @@ phases:
       - echo $EKS_CLUSTER_NAME
       - echo $EKS_KUBECTL_ROLE_ARN
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
-      - kubectl config use-context docker-desktop
+      - kubectl config get-contexts 
+      - kubectl config use-context arn:aws:eks:us-east-2:905234464429:cluster/simple-jwt-api 
       - kubectl apply -f simple_jwt_api.yml 
+      - kubectl get services eksctl-simple-jwt-api -o wide 
       - printf '[{"name":"simple_jwt_api","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
 artifacts:
   files: build.json
